@@ -2,7 +2,7 @@ extends base.pug
 include mixins/video
 
 block content 
-  each info in videos
-    +video(info)
+  each video in videos
+    +video(video)
   else
     div Sorry nothing found.
