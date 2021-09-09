@@ -4,7 +4,7 @@ import Video from "../models/Video";
 
 export const home = async (req, res) => {
   try {
-    const videos = await Video.find({});
+    const videos = await Video.find({}).sort({ createdAt: "desc" });
     return res.render("home", { pageTitle: "Home", videos });
   } catch (error) {
     return res.render("server-error", error);
@@ -71,4 +71,30 @@ export const postUpload = async (req, res) => {
       errorMessage: error._message,
     });
   }
+};
+
+export const deleteVideo = async (req, res) => {
+  const { id } = req.params;
+  try {
+    //delete video
+    await Video.findByIdAndDelete(id);
+    return res.redirect("/");
+  } catch (error) {
+    console.log(`error====>`, error._message);
+  }
+};
+
+export const search = async (req, res) => {
+  const { keyword } = req.query;
+  let videos = [];
+  if (keyword) {
+    //search
+    videos = await Video.find({
+      title: {
+        $regex: new RegExp(`^${keyword}`, "i"),
+        //$gt: 3 greater than3,3보다 많은
+      },
+    }).sort({ createdAt: "desc" });
+  }
+  return res.render("search", { pageTitle: "👁‍🗨 Search Video", videos });
 };
