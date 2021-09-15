@@ -1,7 +1,7 @@
 //server.js는 express, server의 configuration에 관련된 코드만 처리
 import express from "express";
 import morgan from "morgan"; // 로그를 남겨주는 모듈
-import globalRouter from "./routers/globalRouter";
+import rootRouter from "./routers/rootRouter";
 import videoRouter from "./routers/videoRouter";
 import userRouter from "./routers/userRouter";
 
@@ -12,7 +12,7 @@ app.set("view engine", "pug");
 app.set("views", process.cwd() + "/src/views");
 app.use(logger);
 app.use(express.urlencoded({ extended: true })); //express app이 form의 value들을 이해할 수 있도록 하고, 자바스크립트 object 형식으로 통역해줌
-app.use("/", globalRouter);
+app.use("/", rootRouter);
 app.use("/videos", videoRouter);
 app.use("/users", userRouter);
 
