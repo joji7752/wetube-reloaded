@@ -90,7 +90,7 @@ export const search = async (req, res) => {
     //search
     videos = await Video.find({
       title: {
-        $regex: new RegExp(`^${keyword}`, "i"),
+        $regex: new RegExp(`^${keyword}`, "i"), //i는 ignore ,welcome과 Welcome을 구분하지 않음
         //$gt: 3 greater than3,3보다 많은
       },
     }).sort({ createdAt: "desc" });

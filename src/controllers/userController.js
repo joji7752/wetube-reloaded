@@ -1,4 +1,5 @@
 import User from "../models/User";
+import bcrypt from "bcrypt";
 
 export const getJoin = (req, res) =>
   res.render("join", { pageTitle: "🥰 Join" });
@@ -42,16 +43,27 @@ export const getLogin = (req, res) =>
 
 export const postLogin = async (req, res) => {
   const { username, password } = req.body;
-  const exists = await User.exists({ username });
+  const pageTitle = "😊 Login";
   //계정이 존재하는지?
-  if (!exists) {
+  const user = await User.findOne({ username });
+  if (!user) {
     return res.status(400).render("login", {
-      pageTitle: "😊 Login",
+      pageTitle,
       errorMessage: "An account with this username does not exists",
     });
   }
   //패스워드가 일치하는지?
-  res.end();
+  const match = await bcrypt.compare(password, user.password);
+  if (!match) {
+    return res.status(400).render("login", {
+      pageTitle,
+      errorMessage: "Not Match Password",
+    });
+  }
+  //세션에 정보 추가하기, 브라우저마다 세션이 다르다
+  req.session.loggedIn = true;
+  req.session.user = user;
+  return res.redirect("/");
 };
 
 export const edit = (req, res) => res.send("Edit User");
