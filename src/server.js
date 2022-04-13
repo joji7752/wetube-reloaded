@@ -21,8 +21,8 @@ app.use(express.urlencoded({ extended: true })); //express app이 form의 value�
 app.use(
   session({
     secret: process.env.COOKIE_SECRET,
-    resave: false,
-    saveUninitialized: false, //false일 때: session을 수정할 때만 세션을 db에 저장
+    resave: false, //웹사이트 방문시 자동으로 쿠키를 주지 않음.
+    saveUninitialized: false, //false일 때: session이 초기화상태에서 변하지 않았을때는 저장하지 않고, 수정할 때만 세션을 db에 저장
     // cookie: { maxAge: 20000 }, 쿠키만료 지정하는 코드
     store: MongoStore.create({ mongoUrl: process.env.DB_URL }),
     //cookie: { secure: true }
@@ -30,6 +30,7 @@ app.use(
 );
 
 app.use(localsMiddleware); //이 미들웨어는 session object을 사용하기 때문에 session 미들웨어 코드 보다 아래에 와야함
+app.use("/static", express.static("assets"));
 app.use("/", rootRouter);
 app.use("/videos", videoRouter);
 app.use("/users", userRouter);

@@ -14,6 +14,8 @@ html(lang="ko")
           li
             a(href="/") Home
           if loggedIn 
+            li
+              a(href="/users/edit") Edit Profile
             li 
               a(href="/users/logout") Log Out
             li 
@@ -30,4 +32,6 @@ html(lang="ko")
 
     main
       block content
-  include partials/footer.pug
+  include partials/footer
+  script(src="/static/js/main.js") 
+
