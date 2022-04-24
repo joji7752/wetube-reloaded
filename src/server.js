@@ -31,6 +31,7 @@ app.use(
 
 app.use(localsMiddleware); //이 미들웨어는 session object을 사용하기 때문에 session 미들웨어 코드 보다 아래에 와야함
 app.use("/static", express.static("assets"));
+app.use("/uploads", express.static("uploads"));
 app.use("/", rootRouter);
 app.use("/videos", videoRouter);
 app.use("/users", userRouter);

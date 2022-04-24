@@ -148,14 +148,84 @@ export const finishGithubLogin = async (req, res) => {
 };
 
 export const getEdit = (req, res) => {
-  return res.render("edit-profile", { pageTitle: "Edit Profile" });
+  return res.render("users/edit-profile", {
+    pageTitle: `${res.locals.loggedInUser.name}의 Edit Profile`,
+  });
 };
-export const postEdit = (req, res) => {
-  return res.render("edit-profile");
+export const postEdit = async (req, res) => {
+  const {
+    session: {
+      user: { _id, avatarUrl },
+    },
+    body: { email, name, username, location },
+    file,
+  } = req;
+  console.log("file=========>", file);
+  const loggedInUserUsername = res.locals.loggedInUser.username;
+  const loggedInUserEmail = res.locals.loggedInUser.email;
+  const pageTitle = `${res.locals.loggedInUser.name}의 Edit Profile`;
+  const exists = await User.exists({ $or: [{ username }, { email }] });
+  if (exists && username !== loggedInUserUsername) {
+    return res.status(400).render("users/edit-profile", {
+      pageTitle,
+      errorMessage: "입력한 username은 이미 있습니다.",
+    });
+  } else if (exists && email !== loggedInUserEmail) {
+    return res.status(400).render("users/edit-profile", {
+      pageTitle,
+      errorMessage: "입력한 email은 이미 있습니다.",
+    });
+  }
+
+  const updatedUser = await User.findByIdAndUpdate(
+    _id,
+    {
+      avatarUrl: file ? file.path : avatarUrl,
+      email,
+      name,
+      username,
+      location,
+    },
+    { new: true }
+  );
+  req.session.user = updatedUser;
+  return res.redirect("/users/edit");
 };
 
 export const logout = (req, res) => {
   req.session.destroy();
   return res.redirect("/");
 };
+
+export const getChangePassword = (req, res) => {
+  return res.render("users/change-password", { pageTitle: "Change Password" });
+};
+export const postChangePassword = async (req, res) => {
+  const {
+    session: {
+      user: { _id },
+    },
+    body: { oldPassword, newPassword, newPasswordConfirm },
+  } = req;
+  const user = await User.findById(_id);
+  const ok = await bcrypt.compare(oldPassword, user.password);
+  if (!ok) {
+    return res.status(400).render("users/change-password", {
+      pageTitle: "Change Password",
+      errorMessage: "The current password is incorrect",
+    });
+  }
+  if (newPassword !== newPasswordConfirm) {
+    return res.status(400).render("users/change-password", {
+      pageTitle: "Change Password",
+      errorMessage: "The password does not match the confirmation",
+    });
+  }
+
+  user.password = newPassword;
+  await user.save();
+  // send notification
+  return res.redirext("/users/logout");
+};
+
 export const see = (req, res) => res.send("see user");
