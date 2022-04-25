@@ -160,7 +160,7 @@ export const postEdit = async (req, res) => {
     body: { email, name, username, location },
     file,
   } = req;
-  console.log("file=========>", file);
+
   const loggedInUserUsername = res.locals.loggedInUser.username;
   const loggedInUserEmail = res.locals.loggedInUser.email;
   const pageTitle = `${res.locals.loggedInUser.name}의 Edit Profile`;
